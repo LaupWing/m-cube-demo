@@ -16,7 +16,7 @@ const WALL_COLOR = "#1a1a1a";
 const S = Math.SQRT1_2; // 0.707
 
 // LCD params
-const BEND_R = 0.12; // tiny radius — tight wrap around the edge
+const BEND_R = 0.35; // radius for smooth wrap around the outer edge
 const LCD_FAR = 3.5;
 const LCD_HEIGHT = 2.8;
 const RIGHT_EXTENT = 1.5; // how far LCD continues onto right wall
@@ -48,11 +48,13 @@ export default function CornerScene() {
         px = d * -S;
         pz = d * -S;
       } else if (col <= LEFT_SEGS + ARC_SEGS) {
-        // Tight 90° arc wrapping around the corner edge (interior: 225° → 315°)
+        // 90° arc wrapping around the outer edge of the corner
+        // Center behind corner, arc bulges toward viewer
         const arcT = (col - LEFT_SEGS) / ARC_SEGS;
-        const angle = (5 * Math.PI) / 4 + arcT * (Math.PI / 2);
+        const angle = (3 * Math.PI) / 4 - arcT * (Math.PI / 2); // 135° → 45°
+        const cz = -BEND_R * Math.SQRT2;
         px = BEND_R * Math.cos(angle);
-        pz = BEND_R * Math.sin(angle);
+        pz = cz + BEND_R * Math.sin(angle);
       } else {
         // Flat on right wall (goes back-right: direction (S, -S))
         const rightT = (col - LEFT_SEGS - ARC_SEGS) / RIGHT_SEGS;
