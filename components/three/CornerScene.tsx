@@ -16,7 +16,8 @@ const WALL_COLOR = "#1a1a1a";
 const S = Math.SQRT1_2; // 0.707
 
 // LCD params
-const BEND_R = 0.35; // radius for smooth wrap around the outer edge
+const BEND_R = 0.12; // radius for smooth wrap around the outer edge
+const LCD_OFFSET = 0.08; // distance LCD floats in front of wall surface
 const LCD_FAR = 3.5;
 const LCD_HEIGHT = 2.8;
 const RIGHT_EXTENT = 1.5; // how far LCD continues onto right wall
@@ -42,25 +43,27 @@ export default function CornerScene() {
       let px: number, pz: number;
 
       if (col <= LEFT_SEGS) {
-        // Flat on left wall (goes back-left: direction (-S, -S))
+        // Flat on left wall, offset outward along wall normal (-S, 0, S)
         const t = col / LEFT_SEGS;
         const d = LCD_FAR - t * (LCD_FAR - BEND_R);
-        px = d * -S;
-        pz = d * -S;
+        px = d * -S + LCD_OFFSET * -S;
+        pz = d * -S + LCD_OFFSET * S;
       } else if (col <= LEFT_SEGS + ARC_SEGS) {
         // 90° arc wrapping around the outer edge of the corner
         // Center behind corner, arc bulges toward viewer
+        // Radius expanded by LCD_OFFSET so it sits in front of the wall surface
         const arcT = (col - LEFT_SEGS) / ARC_SEGS;
         const angle = (3 * Math.PI) / 4 - arcT * (Math.PI / 2); // 135° → 45°
         const cz = -BEND_R * Math.SQRT2;
-        px = BEND_R * Math.cos(angle);
-        pz = cz + BEND_R * Math.sin(angle);
+        const r = BEND_R + LCD_OFFSET;
+        px = r * Math.cos(angle);
+        pz = cz + r * Math.sin(angle);
       } else {
-        // Flat on right wall (goes back-right: direction (S, -S))
+        // Flat on right wall, offset outward along wall normal (S, 0, S)
         const rightT = (col - LEFT_SEGS - ARC_SEGS) / RIGHT_SEGS;
         const d = BEND_R + rightT * (RIGHT_EXTENT - BEND_R);
-        px = d * S;
-        pz = d * -S;
+        px = d * S + LCD_OFFSET * S;
+        pz = d * -S + LCD_OFFSET * S;
       }
 
       const u = col / totalCols;
