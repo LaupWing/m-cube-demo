@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Text3D, Center, useVideoTexture } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -20,7 +20,7 @@ const BEND_R = 0.12; // radius for smooth wrap around the outer edge
 const LCD_OFFSET = 0.08; // distance LCD floats in front of wall surface
 const LCD_FAR = 3.5;
 const LCD_HEIGHT = 2.8;
-const RIGHT_EXTENT = 1.5; // how far LCD continues onto right wall
+const RIGHT_EXTENT = 0.6; // how far LCD continues onto right wall
 const LEFT_SEGS = 32;
 const ARC_SEGS = 12;
 const RIGHT_SEGS = 12;
@@ -28,7 +28,7 @@ const HEIGHT_SEGS = 8;
 
 export default function CornerScene() {
   const texture = useVideoTexture(
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "/flatscreen.mp4",
     { muted: true, loop: true, start: true }
   );
 
@@ -110,7 +110,7 @@ export default function CornerScene() {
   ];
 
   // M-CUBE text on right wall
-  const td = 2;
+  const td = 2.2;
   const textPos: [number, number, number] = [
     td * S + 0.15 * S,
     0,
@@ -135,6 +135,22 @@ export default function CornerScene() {
       <group position={textPos} rotation={[0, HALF_ANGLE, 0]}>
         <Center>
           <Text3D
+            ref={useCallback((mesh: THREE.Mesh) => {
+              if (!mesh) return;
+              const geo = mesh.geometry;
+              geo.computeBoundingBox();
+              const bb = geo.boundingBox!;
+              const pos = geo.getAttribute("position");
+              const uv = geo.getAttribute("uv");
+              for (let i = 0; i < pos.count; i++) {
+                uv.setXY(
+                  i,
+                  (pos.getX(i) - bb.min.x) / (bb.max.x - bb.min.x),
+                  (pos.getY(i) - bb.min.y) / (bb.max.y - bb.min.y)
+                );
+              }
+              uv.needsUpdate = true;
+            }, [])}
             font={FONT_URL}
             size={0.5}
             height={0.15}
@@ -145,7 +161,7 @@ export default function CornerScene() {
             bevelSegments={3}
           >
             M-CUBE
-            <meshStandardMaterial color="white" />
+            <meshBasicMaterial map={texture} />
           </Text3D>
         </Center>
       </group>
