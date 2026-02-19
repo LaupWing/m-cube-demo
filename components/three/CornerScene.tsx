@@ -179,7 +179,7 @@ export default function CornerScene() {
           side={THREE.DoubleSide}
           polygonOffset
           polygonOffsetFactor={-1}
-          polygonOffsetUnit={-1}
+          polygonOffsetUnits={-1}
         />
       </mesh>
     </group>

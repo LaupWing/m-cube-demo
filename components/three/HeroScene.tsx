@@ -10,9 +10,9 @@ const START_POS = new THREE.Vector3(0, 1, 7);
 // Camera ends perfectly perpendicular to right wall (normal direction S, 0, S)
 const TEXT_CENTER = new THREE.Vector3(1.66, 0, -1.45);
 const END_POS = new THREE.Vector3(
-  TEXT_CENTER.x + 6 * Math.SQRT1_2,
-  0,
-  TEXT_CENTER.z + 6 * Math.SQRT1_2
+  TEXT_CENTER.x + 5 * Math.SQRT1_2,
+  0.3,
+  TEXT_CENTER.z + 5 * Math.SQRT1_2
 );
 const START_TARGET = new THREE.Vector3(0, 0, -0.5);
 const END_TARGET = TEXT_CENTER;
@@ -32,6 +32,10 @@ function CameraRig() {
 
     camera.position.copy(pos.current);
     camera.lookAt(target.current);
+
+    // Narrow FOV as we zoom in to flatten perspective (hide sides)
+    (camera as THREE.PerspectiveCamera).fov = THREE.MathUtils.lerp(50, 35, ease);
+    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
   });
 
   return null;
