@@ -11,7 +11,7 @@ const FONT_URL =
 const HALF_ANGLE = Math.PI / 4;
 const WALL_WIDTH = 5;
 const WALL_HEIGHT = 4;
-const WALL_COLOR = "#1a1a1a";
+const WALL_COLOR = "#2a2a40";
 
 const S = Math.SQRT1_2; // 0.707
 
@@ -119,20 +119,26 @@ export default function CornerScene() {
 
   return (
     <group>
+      {/* Ground plane */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -WALL_HEIGHT / 2, -2]} receiveShadow>
+        <planeGeometry args={[1000, 1000]} />
+        <meshStandardMaterial color="#6a6a80" metalness={0.3} roughness={0.4} />
+      </mesh>
+
       {/* Left wall */}
-      <mesh position={lwPos} rotation={[0, -HALF_ANGLE, 0]}>
+      <mesh position={lwPos} rotation={[0, -HALF_ANGLE, 0]} receiveShadow>
         <planeGeometry args={[WALL_WIDTH, WALL_HEIGHT]} />
         <meshStandardMaterial color={WALL_COLOR} />
       </mesh>
 
       {/* Right wall */}
-      <mesh position={rwPos} rotation={[0, HALF_ANGLE, 0]}>
+      <mesh position={rwPos} rotation={[0, HALF_ANGLE, 0]} receiveShadow>
         <planeGeometry args={[WALL_WIDTH, WALL_HEIGHT]} />
         <meshStandardMaterial color={WALL_COLOR} />
       </mesh>
 
       {/* 3D M-CUBE text on right wall */}
-      <group position={textPos} rotation={[0, HALF_ANGLE, 0]}>
+      <group position={textPos} rotation={[0, HALF_ANGLE, 0]} castShadow>
         <Center>
           <Text3D
             ref={useCallback((mesh: THREE.Mesh) => {
@@ -167,7 +173,7 @@ export default function CornerScene() {
       </group>
 
       {/* LCD: left wall → tight bend at corner → right wall */}
-      <mesh geometry={lcdGeo}>
+      <mesh geometry={lcdGeo} castShadow>
         <meshBasicMaterial
           map={texture}
           side={THREE.DoubleSide}
